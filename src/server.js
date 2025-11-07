@@ -1,0 +1,70 @@
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import connectDB from "./config/db.js";
+import  errorMiddleware  from "./middlewares/errorMiddleware.js";
+import { ApiError } from "./utils/apiError.js";
+import { ApiResponse } from "./utils/apiResponse.js";
+import {asyncHandler}  from "./utils/asyncHandler.js";
+import registrationRoutes from "./routes/registrationRoutes.js";
+
+dotenv.config();
+
+connectDB();
+
+const app = express();
+
+
+
+app.use(express.json({limit : "10kb"}));
+app.use(helmet());
+app.use(errorMiddleware);
+app.use(
+    cors({
+        origin: process.env.FRONTEND_URL,
+        credentials: true,
+    })
+);
+
+const limiter = rateLimit({
+    windowMs: 60*1000,
+    max: 20, 
+    message : "Too many request,please try again later.",
+});
+app.use(limiter);
+
+
+app.get("/",(req,res) => {
+    res.send("SPOCC55 Backend is Running Well");
+});
+
+app.get("/test",
+    asyncHandler(async (req,res) => {
+        const fakeData = {user : "love Varsheny", role : "developer"};
+        res.status(200)
+        .json ( new ApiResponse(200,fakeData,"Test Route working"))
+
+    })
+);
+
+// test error route
+app.get("/error", (req,res,next) => {
+  next( new ApiError(400, "Manual error generated!"));
+});
+
+
+
+app.use("/api/v1", registrationRoutes);
+
+
+app.use(errorMiddleware);
+
+
+const PORT = process.env.PORT || 8000 ;
+
+app.listen(PORT, ()=> {
+    console.log(`Server is running on Port : ${PORT}`);
+});
+
