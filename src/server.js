@@ -9,6 +9,8 @@ import { ApiError } from "./utils/ApiError.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
 import {asyncHandler}  from "./utils/AsyncHandler.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
+import { createServer } from "http";
+
 
 dotenv.config();
 
@@ -21,7 +23,11 @@ app.use(helmet());
 app.use(errorMiddleware);
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL,
+        // origin: process.env.FRONTEND_URL,
+        origin: [
+            "http://localhost:5173",
+            "https://registrationccc.vercel.app"
+        ],
         credentials: true,
     })
 );
@@ -60,9 +66,12 @@ app.use("/api/v1", registrationRoutes);
 app.use(errorMiddleware);
 
 
-const PORT = process.env.PORT || 8000 ;
+// const PORT = process.env.PORT || 8000 ;
 
-app.listen(PORT, ()=> {
-    console.log(`Server is running on Port : ${PORT}`);
-});
+// app.listen(PORT, ()=> {
+//     console.log(`Server is running on Port : ${PORT}`);
+// });
 
+
+const server = createServer(app);
+export default server;
