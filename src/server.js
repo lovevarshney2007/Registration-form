@@ -69,6 +69,11 @@ app.get("/error", (req,res,next) => {
   next( new ApiError(400, "Manual error generated!"));
 });
 
+app.get("/api/test-cors", (req, res) => {
+  res.json({ success: true, message: "CORS is configured correctly ✅" });
+});
+
+
 
 
 app.use("/api/v1", registrationRoutes);
@@ -77,11 +82,11 @@ app.use("/api/v1", registrationRoutes);
 app.use(errorMiddleware);
 
 
-// const PORT = process.env.PORT || 8000 ;
+const PORT = process.env.PORT || 8000 ;
 
-// app.listen(PORT, ()=> {
-//     console.log(`Server is running on Port : ${PORT}`);
-// });
+app.listen(PORT, ()=> {
+    console.log(`Server is running on Port : ${PORT}`);
+});
 
 
 const server = createServer(app);

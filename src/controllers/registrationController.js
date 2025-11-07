@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import {registrationValidation } from "../validations/registrationValidation.js";
+import { sendRegisterationEmail } from "../utils/emailService.js";
 
 const registerStudent = asyncHandler(async (req,res,next) => {
 
@@ -13,6 +14,8 @@ const registerStudent = asyncHandler(async (req,res,next) => {
      });
  
      const student = await Registration.create(value);
+
+     await sendRegisterationEmail(student.email, student.name);
  
      return res
      .status(201)
