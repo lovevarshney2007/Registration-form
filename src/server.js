@@ -20,15 +20,26 @@ const app = express();
 
 app.use(express.json({limit : "10kb"}));
 app.use(helmet());
-app.use(errorMiddleware);
+// app.use(errorMiddleware);
+
+const allowedOrigins = [
+            "http://localhost:5173",
+            "https://registrationccc.vercel.app"
+];
+
 app.use(
     cors({
         // origin: process.env.FRONTEND_URL,
-        origin: [
-            "http://localhost:5173",
-            "https://registrationccc.vercel.app"
-        ],
-        credentials: true,
+        origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("🚫 Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
     })
 );
 
