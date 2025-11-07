@@ -5,9 +5,9 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import connectDB from "./config/db.js";
 import  errorMiddleware  from "./middlewares/errorMiddleware.js";
-import { ApiError } from "./utils/apiError.js";
-import { ApiResponse } from "./utils/apiResponse.js";
-import {asyncHandler}  from "./utils/asyncHandler.js";
+import { ApiError } from "./utils/ApiError.js";
+import { ApiResponse } from "./utils/ApiResponse.js";
+import {asyncHandler}  from "./utils/AsyncHandler.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
 
 dotenv.config();
