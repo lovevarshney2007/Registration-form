@@ -9,9 +9,9 @@ const registerStudent = asyncHandler(async (req,res,next) => {
 
    try {
 
-    const { capchaToken } = req.body;
-    if(!capchaToken){
-        throw new ApiError(400,"Capcha token is required");
+    const { captchaToken } = req.body;
+    if(!captchaToken){
+        throw new ApiError(400,"captchaToken  is required");
     }
 
     const verifyURL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`
