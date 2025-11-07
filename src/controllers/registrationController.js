@@ -4,6 +4,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import {registrationValidation } from "../validations/registrationValidation.js";
 import { sendRegisterationEmail } from "../utils/emailService.js";
+import axios from "axios";
+
 
 const registerStudent = asyncHandler(async (req,res,next) => {
 
