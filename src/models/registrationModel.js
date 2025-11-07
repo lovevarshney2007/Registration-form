@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import Joi from "joi";
 
 const registrationSchema = new mongoose.Schema({
   name: {

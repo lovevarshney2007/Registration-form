@@ -2,43 +2,35 @@ import { Registration } from "../models/registrationModel.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import {registrationValidation } from "../validations/registrationValidation.js";
 
 const registerStudent = asyncHandler(async (req,res,next) => {
 
-    const { name,
-    studentNumber,
-    email,
-    gender,
-    branch,
-    phone,
-    unstopId,
-    residence } = req.body;
+   try {
 
-    if( !name || !studentNumber || !email || !gender || !branch || !phone || !unstopId || !residence){
-        throw new ApiError(400 , "All fields are required");
+     const  value  = await registrationValidation.validateAsync(req.body,{
+        abortEarly: true,
+     });
+ 
+     const student = await Registration.create(value);
+ 
+     return res
+     .status(201)
+     .json(new ApiResponse(201,student,"Registration Successful"))
+   } catch (error) {
+    if(error.isJoi || error.message.includes("registered")){
+        const message = error.details && error.details.length > 0
+        ? error.details[0].message
+        : error.message;
+
+        return res.status(400).json({
+           success: false,
+           message,
+        });
     }
 
-    const existing = await Registration.findOne({
-        $or : [{ email }, {phone} , {studentNumber}],
-    });
-    if(existing){
-        throw new ApiError(409,"A registration already exists with same Email, Phone or Student Number.");
-    }
-
-    const student = await Registration.create ({
-        name,
-        studentNumber,
-        email,
-        gender,
-        branch,
-        phone,
-        unstopId,
-        residence
-    });
-
-    return res
-    .status(201)
-    .json(new ApiResponse(201,student,"Registration Successful"))
+    next (error);
+   }
     
 })
 
