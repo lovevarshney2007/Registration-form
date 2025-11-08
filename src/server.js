@@ -150,11 +150,11 @@ app.use("/api/v1", registrationRoutes);
 app.use(errorMiddleware);
 
 
-const PORT = process.env.PORT || 8000 ;
+// const PORT = process.env.PORT || 8000 ;
 
-app.listen(PORT, ()=> {
-    console.log(`Server is running on Port : ${PORT}`);
-});
+// app.listen(PORT, ()=> {
+//     console.log(`Server is running on Port : ${PORT}`);
+// });
 
 
 const server = createServer(app);
