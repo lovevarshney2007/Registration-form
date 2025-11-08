@@ -95,6 +95,10 @@ const registrationValidation = Joi.object({
       "any.only": "Residence must be either Hosteller or Day Scholar",
     }),
 
+    captchaToken: Joi.string()
+    .required()
+
+
 })
 
 export {
