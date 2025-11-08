@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import sanitize from "mongo-sanitize";
+import xss from "xss";
+import hpp from "hpp";
 import connectDB from "./config/db.js";
 import  errorMiddleware  from "./middlewares/errorMiddleware.js";
 import { ApiError } from "./utils/ApiError.js";
@@ -20,7 +23,72 @@ const app = express();
 
 app.use(express.json({limit : "10kb"}));
 app.use(helmet());
-// app.use(errorMiddleware);
+
+app.use((req, res, next) => {
+  // sanitize req.body
+  if (req.body && typeof req.body === "object") {
+    console.log("🧼 Sanitizing input data");
+
+    for (const key in req.body) {
+      req.body[key] = sanitize(req.body[key]);
+    }
+  }
+
+  // sanitize req.query safely (no reassignment)
+  if (req.query && typeof req.query === "object") {
+    for (const key in req.query) {
+      req.query[key] = sanitize(req.query[key]);
+    }
+  }
+
+  // sanitize req.params
+  if (req.params && typeof req.params === "object") {
+    for (const key in req.params) {
+      req.params[key] = sanitize(req.params[key]);
+    }
+  }
+
+  next();
+});
+
+// app.use(xss());
+app.use((req, res, next) => {
+  // sanitize body
+  if (req.body && typeof req.body === "object") {
+    for (const key in req.body) {
+      if (typeof req.body[key] === "string") {
+        req.body[key] = xss(req.body[key]);
+      }
+    }
+  }
+
+  // sanitize query
+  if (req.query && typeof req.query === "object") {
+    for (const key in req.query) {
+      if (typeof req.query[key] === "string") {
+        req.query[key] = xss(req.query[key]);
+      }
+    }
+  }
+
+  // sanitize params
+  if (req.params && typeof req.params === "object") {
+    for (const key in req.params) {
+      if (typeof req.params[key] === "string") {
+        req.params[key] = xss(req.params[key]);
+      }
+    }
+  }
+
+  next();
+});
+
+app.use(
+  hpp({
+   
+    whitelist: ["filter", "sort"], 
+  })
+);
 
 const allowedOrigins = [
             "http://localhost:5173",

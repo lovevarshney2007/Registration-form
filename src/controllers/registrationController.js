@@ -12,18 +12,58 @@ const registerStudent = asyncHandler(async (req,res,next) => {
    try {
 
     const { captchaToken } = req.body;
-    if(!captchaToken){
+
+    const bypassCaptcha =
+      process.env.NODE_ENV === "development" ||
+      process.env.RECAPTCHA_BYPASS === "true";
+
+    if(!captchaToken && !bypassCaptcha){
         throw new ApiError(400,"captchaToken  is required");
     }
 
-    const verifyURL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`
+    if(bypassCaptcha){
+       console.log("⚠️ reCAPTCHA verification bypassed (development or RECAPTCHA_BYPASS=true)");
+    }
+    else{
+      const params = new URLSearchParams();
+      params.append("secret", process.env.RECAPTCHA_SECRET_KEY);
+      params.append("response", captchaToken);
 
-    const { data } = await axios.post(verifyURL);
+      // POST request to Google reCAPTCHA verification API
+      const { data } = await axios.post(
+        "https://www.google.com/recaptcha/api/siteverify",
+        params.toString(),
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      );
+
+      console.log("🔍 reCAPTCHA verification data:", data);
+       if (!data.success) {
+        const errorCode = data["error-codes"] ? data["error-codes"][0] : "unknown";
+        if (errorCode === "timeout-or-duplicate") {
+          throw new ApiError(400, "Captcha expired or already used. Please refresh and try again.");
+        } else if (errorCode === "invalid-input-response") {
+          throw new ApiError(400, "Invalid reCAPTCHA token. Please solve again.");
+        } else {
+          throw new ApiError(400, `Captcha verification failed (${errorCode}).`);
+        }
+      }
+    }
+
+    // const verifyURL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`
+
+  //   const { data } = await axios.post(verifyURL);
+  //     console.log("🔍 reCAPTCHA verification data:", data);
 
     
-    if (!data.success) {
-      throw new ApiError(400, "Captcha verification failed. Please try again.");
-    }
+  //   if (!data.success) {
+  //     const errorCode =  data['error-codes'] ? data['error-codes'][0] : 'unknown';
+  //      if (errorCode === 'timeout-or-duplicate') {
+  //   throw new ApiError(400, "Captcha expired or already used. Please refresh and try again.");
+  // } else {
+  //   throw new ApiError(400, `Captcha verification failed (${errorCode}).`);
+  // }
+
+  //   }
 
      const  value  = await registrationValidation.validateAsync(req.body,{
         abortEarly: true,
