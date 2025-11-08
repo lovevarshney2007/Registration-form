@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
-import Joi from "joi";
+import Joi, { required } from "joi";
 
 const registrationSchema = new mongoose.Schema({
   name: {
@@ -90,6 +90,10 @@ const registrationSchema = new mongoose.Schema({
     enum: ["Hosteller", "Day Scholar"],
     required: [true, "Residence type is required"],
   },
+  captchaToken: {
+    type: String,
+    required: true,
+  }
  },
  {
     timestamps: true
