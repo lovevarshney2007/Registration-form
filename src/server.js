@@ -23,11 +23,12 @@ const app = express();
 
 app.use(express.json({limit : "10kb"}));
 app.use(helmet());
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 app.use((req, res, next) => {
   // sanitize req.body
   if (req.body && typeof req.body === "object") {
-    console.log("🧼 Sanitizing input data");
+    console.log(" Sanitizing input data");
 
     for (const key in req.body) {
       req.body[key] = sanitize(req.body[key]);
@@ -111,12 +112,26 @@ app.use(
     })
 );
 
-const limiter = rateLimit({
-    windowMs: 60*1000,
-    max: 20, 
-    message : "Too many request,please try again later.",
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 100,
+    message: "Too many general requests from this IP, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false,
 });
-app.use(limiter);
+app.use(globalLimiter);
+
+const strictRegistrationLimiter = rateLimit({
+    windowMs: 60*60*1000,
+    max: 5, 
+    standardHeaders: true,
+    legacyHeaders: false,
+    message : { 
+        success: false, 
+        message: "Too many registration attempts. Please try again after one hour." 
+    },
+});
+app.use(strictRegistrationLimiter);
 
 
 app.get("/",(req,res) => {
