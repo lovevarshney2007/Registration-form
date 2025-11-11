@@ -3,7 +3,7 @@ import { registerStudent , getAllRegistrations} from "../controllers/registratio
 
 const router = express.Router();
 
-router.post("/register",strictRegistrationLimiter,registerStudent);
-router.get("/registrations",globalLimiter, getAllRegistrations);
+router.post("/register",registerStudent);
+router.get("/registrations", getAllRegistrations);
 
 export default router;
