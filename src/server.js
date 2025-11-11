@@ -112,26 +112,36 @@ app.use(
     })
 );
 
-const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, 
-    max: 100,
-    message: "Too many general requests from this IP, please try again later.",
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-app.use(globalLimiter);
+// const globalLimiter = rateLimit({
+//     windowMs: 15 * 60 * 1000, 
+//     max: 100,
+//     message: "Too many general requests from this IP, please try again later.",
+//     standardHeaders: true,
+//     legacyHeaders: false,
+// });
+// app.use(globalLimiter);
 
-const strictRegistrationLimiter = rateLimit({
-    windowMs: 60*60*1000,
-    max: 5, 
-    standardHeaders: true,
-    legacyHeaders: false,
-    message : { 
-        success: false, 
-        message: "Too many registration attempts. Please try again after one hour." 
-    },
-});
-app.use(strictRegistrationLimiter);
+// const strictRegistrationLimiter = rateLimit({
+//     windowMs: 60*60*1000,
+//     max: 5, 
+//     standardHeaders: true,
+//     legacyHeaders: false,
+//     message : { 
+//         success: false, 
+//         message: "Too many registration attempts. Please try again after one hour." 
+//     },
+// });
+// app.use(strictRegistrationLimiter);
+
+
+const limiter = rateLimit({
+    windowMs: 60*1000,
+    max: 20, 
+    message : "Too many request,please try again later.",
+  });
+
+
+app.use(limiter);
 
 
 app.get("/",(req,res) => {
