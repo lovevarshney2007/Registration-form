@@ -30,11 +30,11 @@ const registrationSchema = new mongoose.Schema({
         message: "Invalid email format",
       },
       {
-        validator: function(value){
-          if(!value.endsWith("@akgec.ac.in")) return false;
+        validator: function (value) {
+          if (!value.endsWith("@akgec.ac.in")) return false;
 
           const match = value.match(/(\d{7,8})@akgec\.ac\.in$/);
-          if(!match) return false;
+          if (!match) return false;
 
           const emailStudentNumber = match[1];
 
@@ -57,7 +57,7 @@ const registrationSchema = new mongoose.Schema({
       "CSE",
       "CSE(AIML)",
       "CSE(DS)",
-      "CS(HINDI)",
+      "CSE(HINDI)",
       "CS",
       "IT",
       "CSIT",
@@ -94,17 +94,17 @@ const registrationSchema = new mongoose.Schema({
     type: String,
     required: true,
   }
- },
- {
+},
+  {
     timestamps: true
- }
+  }
 );
 
 registrationSchema.index({
-    email:1,
-    studentNumber: 1,
-    phone:1
-},{unique:true}
+  email: 1,
+  studentNumber: 1,
+  phone: 1
+}, { unique: true }
 );
 
-export const Registration = mongoose.model("Registration",registrationSchema);
+export const Registration = mongoose.model("Registration", registrationSchema);

@@ -1,47 +1,45 @@
 import Joi from "joi";
-import { Registration } from "../models/registrationModel.js";
 
 const registrationValidation = Joi.object({
-    name: Joi.string()
+  name: Joi.string()
     .min(3)
     .max(30)
     .pattern(/^[A-Za-z ]+$/)
     .required()
     .messages({
-        "string.empty": "Name is required",
-        "string.pattern.base": "Name must contain only alphabets and spaces"
+      "string.empty": "Name is required",
+      "string.pattern.base": "Name must contain only alphabets and spaces",
+      "string.min": "Name must be at least 3 characters long",
+      "string.max": "Name must be at most 30 characters long",
     }),
 
-    studentNumber: Joi.string()
+  studentNumber: Joi.string()
     .pattern(/^24[0-9]{5,6}$/)
     .required()
     .messages({
-        "string.pattern.base": "Student ID must start with 24 and be 7–8 digits",
+      "string.pattern.base": "Student ID must start with 24 and be 7–8 digits",
+      "string.empty": "Student ID is required",
     }),
 
-    email: Joi.string()
+  email: Joi.string()
     .email()
     .pattern(/@akgec\.ac\.in$/)
     .required()
-    .external(async (value) => {
-      const existing = await Registration.findOne({ email: value });
-      if (existing) {
-        throw new Error("This email is already registered!");
-      }
-    })
     .messages({
       "string.email": "Invalid email format",
       "string.pattern.base": "Use your official college email ID (@akgec.ac.in)",
+      "string.empty": "Email is required",
     }),
 
-    gender: Joi.string()
-    .valid("Male","Female")
+  gender: Joi.string()
+    .valid("Male", "Female")
     .required()
     .messages({
-        "any.only": "Gender must be either Male or Female",
+      "any.only": "Gender must be either Male or Female",
+      "string.empty": "Gender is required",
     }),
 
-    branch: Joi.string()
+  branch: Joi.string()
     .valid(
       "CSE",
       "CSE(AIML)",
@@ -58,49 +56,40 @@ const registrationValidation = Joi.object({
     )
     .required()
     .messages({
-        "any.only": "Invalid branch selection",
+      "any.only": "Invalid branch selection",
+      "string.empty": "Branch is required",
     }),
 
-    phone: Joi.string()
+  phone: Joi.string()
     .pattern(/^[6-9]\d{9}$/)
     .required()
-     .external(async (value) => {
-      const existing = await Registration.findOne({ phone: value });
-      if (existing) {
-        throw new Error("This phone number is already registered!");
-      }
-    })
     .messages({
-        "string.pattern.base":"Enter a valid 10-digit Mobile number",
+      "string.pattern.base": "Enter a valid 10-digit mobile number",
+      "string.empty": "Phone number is required",
     }),
 
-
-    unstopId: Joi.string()
+  unstopId: Joi.string()
     .pattern(/^[A-Za-z0-9_.]+$/)
     .required()
-     .external(async (value) => {
-      const existing = await Registration.findOne({ unstopId: value });
-      if (existing) {
-        throw new Error("This unstopId is already registered!");
-      }
-    })
     .messages({
       "string.pattern.base":
         "Unstop ID can contain only letters, numbers, dot and underscore",
+      "string.empty": "Unstop ID is required",
     }),
-    residence: Joi.string()
+
+  residence: Joi.string()
     .valid("Hosteller", "Day Scholar")
     .required()
     .messages({
       "any.only": "Residence must be either Hosteller or Day Scholar",
+      "string.empty": "Residence is required",
     }),
 
-    captchaToken: Joi.string()
+  captchaToken: Joi.string()
     .required()
+    .messages({
+      "string.empty": "Captcha token is required",
+    }),
+});
 
-
-})
-
-export {
-    registrationValidation
-}
+export { registrationValidation };
