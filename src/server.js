@@ -21,12 +21,11 @@ connectDB();
 
 const app = express();
 
-<<<<<<< HEAD
+
 app.use(requestId);
-=======
+
 app.set("trust proxy", 1);
 
->>>>>>> 534ea81bc78768941917e210abb0803c43231ee3
 app.use(express.json({limit : "10kb"}));
 
 app.use(helmet()); 
@@ -98,11 +97,10 @@ app.use(
     })
 );
 
-<<<<<<< HEAD
 
 app.use(globalLimiter);
 
-=======
+
 // const globalLimiter = rateLimit({
 //     windowMs: 15 * 60 * 1000, 
 //     max: 100,
@@ -135,7 +133,6 @@ const limiter = rateLimit({
 app.use(limiter);
 
 
->>>>>>> 534ea81bc78768941917e210abb0803c43231ee3
 app.get("/",(req,res) => {
     res.send("SPOCC55 Backend is Running Well");
 });
