@@ -21,7 +21,12 @@ connectDB();
 
 const app = express();
 
+<<<<<<< HEAD
 app.use(requestId);
+=======
+app.set("trust proxy", 1);
+
+>>>>>>> 534ea81bc78768941917e210abb0803c43231ee3
 app.use(express.json({limit : "10kb"}));
 
 app.use(helmet()); 
@@ -93,9 +98,44 @@ app.use(
     })
 );
 
+<<<<<<< HEAD
 
 app.use(globalLimiter);
 
+=======
+// const globalLimiter = rateLimit({
+//     windowMs: 15 * 60 * 1000, 
+//     max: 100,
+//     message: "Too many general requests from this IP, please try again later.",
+//     standardHeaders: true,
+//     legacyHeaders: false,
+// });
+// app.use(globalLimiter);
+
+// const strictRegistrationLimiter = rateLimit({
+//     windowMs: 60*60*1000,
+//     max: 5, 
+//     standardHeaders: true,
+//     legacyHeaders: false,
+//     message : { 
+//         success: false, 
+//         message: "Too many registration attempts. Please try again after one hour." 
+//     },
+// });
+// app.use(strictRegistrationLimiter);
+
+
+const limiter = rateLimit({
+    windowMs: 60*1000,
+    max: 20, 
+    message : "Too many request,please try again later.",
+  });
+
+
+app.use(limiter);
+
+
+>>>>>>> 534ea81bc78768941917e210abb0803c43231ee3
 app.get("/",(req,res) => {
     res.send("SPOCC55 Backend is Running Well");
 });
