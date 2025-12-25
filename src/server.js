@@ -7,7 +7,6 @@ import hpp from "hpp";
 import connectDB from "./config/db.js";
 import requestId from "./middlewares/requestId.js";
 import  errorMiddleware  from "./middlewares/errorMiddleware.js";
-import { ApiError } from "./utils/ApiError.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
 import {asyncHandler}  from "./utils/AsyncHandler.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
