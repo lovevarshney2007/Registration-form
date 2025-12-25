@@ -12,6 +12,7 @@ import {asyncHandler}  from "./utils/AsyncHandler.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
 import { createServer } from "http";
 import { globalLimiter } from "./middlewares/securityLimiters.js";
+import chatbotRoutes from "./routes/chatbotRoutes.js";
 
 
 dotenv.config();
@@ -125,6 +126,8 @@ app.get("/test",
 
 
 app.use("/api/v1", registrationRoutes);
+app.use("/api/v1/chatbot", chatbotRoutes);
+
 
 app.use(errorMiddleware);
 

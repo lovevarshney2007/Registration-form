@@ -44,7 +44,7 @@ const registrationValidation = Joi.object({
       "CSE",
       "CSE(AIML)",
       "CSE(DS)",
-      "CS(HINDI)",
+      "CSE(HINDI)",
       "CS",
       "IT",
       "CSIT",

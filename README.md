@@ -1,6 +1,6 @@
 # Secure Registration Backend
 
-A production-ready backend for handling secure student registrations with strong validation, CAPTCHA protection, admin access control, and abuse prevention.
+A production-ready backend for handling secure student registrations with strong validation, CAPTCHA protection, admin access control, and an AI-powered chatbot, built with real-world backend security practices.
 
 This project is designed using **real-world backend security practices** and is suitable for production deployment.
 
@@ -18,40 +18,60 @@ This project is designed using **real-world backend security practices** and is 
 - **Rate Limiting**
 - **Request ID tracing**
 
----
 
+
+---
 ## 🔐 Key Features
 
+### Registration System
 - Secure student registration API
-- Invisible reCAPTCHA v2 for bot protection
-- Development-only CAPTCHA bypass (env-protected)
-- Joi-based request validation with clear error messages
-- MongoDB unique constraints to prevent duplicate registrations
-- Centralized error handling (no stack trace leaks in production)
-- Admin-only APIs protected using API key authentication
-- Pagination limit enforcement to prevent abuse
-- Rate limiting to block spam and brute-force attempts
-- Request ID middleware for debugging and tracing
-- Production hardening using security best practices
+- Invisible reCAPTCHA v2 protection
+- Development-only CAPTCHA bypass (env protected)
+- Joi + Mongoose dual-layer validation
+- Duplicate registration prevention
+
+### Chatbot System
+- AI-powered chatbot
+- Normal chat and streaming chat support
+- Thread-based conversation memory
+- Follow-up suggestion generation
+- Swagger-documented APIs
+
+### Security & Hardening
+- Centralized error handling
+- No stack traces leaked in production
+- Admin APIs protected via API key
+- Rate limiting to prevent abuse
+- Request ID tracing for debugging
+
+
+
+
 
 ---
-
 ## 🧠 Validation Strategy
 
-- **Joi (API Layer)**  
-  Ensures request data format and required fields before database access.
+### API Layer (Joi)
+- Validates request structure
+- Blocks malformed requests early
 
-- **Mongoose (Database Layer)**  
-  Ensures data integrity using schema rules and unique indexes.
+### Database Layer (Mongoose)
+- Schema-level validation
+- Unique indexes for data integrity
 
 ---
 
 ## 📌 API Endpoints
 
+---
+
+## 🧾 Registration APIs
+
 ### 1️⃣ Register Student
 
+**POST**
 
-POST /api/v1/register
+ /api/v1/register
 
 
 **Request Body**
@@ -77,8 +97,92 @@ Success Response
   "requestId": "uuid"
 }
 
+2️⃣ Get All Registrations (Admin Only)
+
+GET 
+/api/v1/registrations
+
+
+Headers
+x-admin-key: <ADMIN_API_KEY>
+
+
 
 3️⃣ Health Check
 
+
+
 GET /health
 { "status": "ok" }
+
+
+🤖 Chatbot APIs
+ 
+Base Route: /api/v1/chatbot
+
+4️⃣ Chat (Non-Streaming)
+
+POST
+
+/api/v1/chatbot/chat
+
+Request Body
+{
+  "query": "What is CCC?",
+  "thread_id": null
+}
+
+Response
+{
+  "success": true,
+  "message": "Chat response fetched",
+  "data": {
+    "answer": "CCC stands for Cloud Computing Cell...",
+    "thread_id": "abc123",
+    "tool_type": "rag",
+    "tool_name": "retrieve_society_info"
+  },
+  "requestId": "uuid"
+}
+
+5️⃣ Chat Stream (Real-Time)
+
+POST
+
+/api/v1/chatbot/chat/stream
+
+Request Body
+{
+  "query": "What is CCC?",
+  "thread_id": "init"
+}
+
+Response
+
+Server-Sent Events (SSE)
+
+Token-by-token streamed output
+
+6️⃣ Suggest Follow-up Questions
+
+POST
+
+/api/v1/chatbot/suggest
+
+Request Body
+{
+  "final_answer": "CCC is a student-run cloud society...",
+  "thread_id": "abc123"
+}
+
+Response
+{
+  "suggestions": [
+    "How can I join CCC?",
+    "What events does CCC organize?"
+  ],
+  "thread_id": "abc123"
+}
+
+
+
