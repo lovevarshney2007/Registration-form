@@ -32,57 +32,74 @@ const registerStudent = asyncHandler(async (req, res) => {
   }
 
   if (!bypassCaptcha) {
-    const params = new URLSearchParams();
-    params.append("secret", process.env.RECAPTCHA_SECRET_KEY);
-    params.append("response", captchaToken);
+    // const params = new URLSearchParams();
+    // params.append("secret", process.env.RECAPTCHA_SECRET_KEY);
+    // params.append("response", captchaToken);
 
     // POST request to Google reCAPTCHA verification API
     const { data } = await axios.post(
       "https://www.google.com/recaptcha/api/siteverify",
-      params.toString(),
+      new URLSearchParams({
+        secret: process.env.RECAPTCHA_SECRET_KEY,
+        response: captchaToken,
+      }).toString(),
       {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         timeout: 5000,
       }
     );
-   if (process.env.NODE_ENV === "development") {
-  console.log("reCAPTCHA response:", data);
-}
+    if (isDev) {
+      console.log("reCAPTCHA response:", data);
+    }
+
 
     if (!data.success) {
-      const errorCode = data["error-codes"]?.[0] || "unknown";
-
-      if (errorCode === "timeout-or-duplicate") {
-        throw new ApiError(400, "Captcha expired or already used.");
-      }
-      if (errorCode === "invalid-input-response") {
-        throw new ApiError(400, "Invalid reCAPTCHA token.");
-      }
-
-      throw new ApiError(400, "Captcha verification failed.");
+      throw new ApiError(400, "Captcha verification failed");
     }
-  } else if (isDev) {
-    console.log("reCAPTCHA bypassed (development mode)");
+
+    if (data.score < 0.5) {
+      throw new ApiError(403, "Bot activity detected");
+    }
+
+    if (data.action !== "register") {
+      throw new ApiError(400, "Invalid captcha action");
+    }
+
+    //   if (!data.success) {
+    //     const errorCode = data["error-codes"]?.[0] || "unknown";
+
+
+    //     if (errorCode === "timeout-or-duplicate") {
+    //       throw new ApiError(400, "Captcha expired or already used.");
+    //     }
+    //     if (errorCode === "invalid-input-response") {
+    //       throw new ApiError(400, "Invalid reCAPTCHA token.");
+    //     }
+
+    //     throw new ApiError(400, "Captcha verification failed.");
+    //   }
+
+    // } else if (isDev) {
+    //   console.log("reCAPTCHA bypassed (development mode)");
+    // }
+
   }
 
+    // validation
+    const value = await registrationValidation.validateAsync(req.body, {
+      abortEarly: true,
+      stripUnknown: true,
+    });
 
+    const student = await Registration.create(value);
 
-  // validation
-  const value = await registrationValidation.validateAsync(req.body, {
-  abortEarly: true,
-  stripUnknown: true,
-});
+    await sendRegisterationEmail(student.email, student.name);
 
-const student = await Registration.create(value);
+    return res
+      .status(201)
+      .json(new ApiResponse(201, student, "Registration Successful", req.id))
+  })
 
-await sendRegisterationEmail(student.email, student.name);
-
-return res
-  .status(201)
-  .json(new ApiResponse(201, student, "Registration Successful", req.id))
-
-
-})
 
 const getAllRegistrations = asyncHandler(async (req, res, next) => {
   const {
